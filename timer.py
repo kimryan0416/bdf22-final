@@ -11,7 +11,7 @@ import requests
 import os
 
 _CWD = os.path.dirname(os.path.abspath(__file__))
-_CITIZEN_RESPONSE_OUTPUT_FOLDER = "citizenData/"
+_CITIZEN_RESPONSE_OUTPUT_FOLDER = os.path.normpath(_CWD+"/citizenData/")
 _CITIZEN_REQUEST_HEADERS = {
     "Host":"citizen.com",
     #User-Agent Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:107.0) Gecko/20100101 Firefox/107.0
@@ -34,6 +34,14 @@ _TIME_DELAY = 60    # Seconds delay between timer
 # Main function - called upon file being run
 def main():
 
+    # First check if an output folder exists. If it doesn't create it
+    isExist = os.path.exists(_CITIZEN_RESPONSE_OUTPUT_FOLDER)
+    if not isExist:
+        os.makedirs(_CITIZEN_RESPONSE_OUTPUT_FOLDER)
+        print("[TIMER] Path to output folder has been created!")
+    else:
+        print("[TIMER] Path to output folder already exists!")
+
     # The timer function that runs every `_TIME_DELAY` seconds
     def timer():
         # Get current time for the filename
@@ -46,7 +54,7 @@ def main():
         # Convert response into serialized string
         json_object = json.dumps(r.json(), indent=2)
         # Create a new file, write to file, and then close file
-        json_file = os.path.normpath(_CWD+"/"+_CITIZEN_RESPONSE_OUTPUT_FOLDER+"/"+timestr+".json")
+        json_file = os.path.normpath(_CITIZEN_RESPONSE_OUTPUT_FOLDER+"/"+timestr+".json")
         outfile = open(json_file, "w")
         outfile.write(json_object)
         outfile.close()
